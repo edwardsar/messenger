@@ -68,24 +68,25 @@ int main()
         cout << "Client connected [" << inet_ntoa(clientaddr.sin_addr) << ":" << ntohs(clientaddr.sin_port) <<"]\n";
         // receive and send data
         char * token; //used to parse commands from client
-        token = strtok(cmdBuffer, " "); // begins parsing command
+		char * nextToken;
+        token = strtok_s(cmdBuffer, " ", &nextToken); // begins parsing command
         if( strcmp(token, "reg") == 0){
-            token = strtok(NULL, "\n");
+            token = strtok_s(NULL, "\n", &nextToken);
             cout << "--[Registering User] " << token << " : " << inet_ntoa(clientaddr.sin_addr) << endl; //inet_ntoa produces a string from stored ip addres
             userIPDatabase[token] = inet_ntoa(clientaddr.sin_addr); // stores username and ip in database
         }
         else if( strcmp(token, "query") == 0) {
-            token = strtok(NULL, "\n");
+            token = strtok_s(NULL, "\n", &nextToken);
             cout << "--[Query User] " << token << " -> ";
             map<string,string>::iterator itr;
             itr = userIPDatabase.find(token); //iterator itr points to end() if there is no username IP pair found 
             if(itr != userIPDatabase.end()){
                 cout << userIPDatabase[token] << endl;
-                strncpy(responseBuffer, userIPDatabase[token].c_str(),  bufferSize); // builds response ip for client
+                strncpy_s(responseBuffer, userIPDatabase[token].c_str(),  bufferSize); // builds response ip for client
             }
             else {
                 cout << "Not Found" << endl;
-                strcpy(responseBuffer,"NF"); //if username doesn't have ip associated then NF will be sent to client
+                strncpy_s(responseBuffer,"NF", 2); //if username doesn't have ip associated then NF will be sent to client
             }
             sendto(listener, responseBuffer, bufferSize, 0, (struct sockaddr *) &clientaddr, clientaddrSize);
         }
